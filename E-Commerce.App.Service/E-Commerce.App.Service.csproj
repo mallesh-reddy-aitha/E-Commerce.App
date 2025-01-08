@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <RootNamespace>E_Commerce.App.Service</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\E-Commerce.App.Core\E-Commerce.App.Core.csproj" />
+    <ProjectReference Include="..\E-Commerce.App.Repository\E-Commerce.App.Repository.csproj" />
+  </ItemGroup>
+
+</Project>
