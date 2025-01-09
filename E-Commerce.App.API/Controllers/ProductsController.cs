@@ -1,5 +1,7 @@
 ﻿using E_Commerce.App.Core.Entities;
 using E_Commerce.App.Infrastructure.Data;
+using E_Commerce.App.Repository.Interface;
+using E_Commerce.App.Repository.Specifications;
 using E_Commerce.App.Service.Interface;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -16,55 +18,91 @@ namespace E_Commerce.App.API.Controllers
     public class ProductsController : ControllerBase
     {
         private readonly IProductsService productsService;
-        public ProductsController(IProductsService productsService)
+        private readonly IProductsRepository productsRepository;
+
+        public ProductsController(IProductsService productsService,
+            IProductsRepository productsRepository)
         {
             this.productsService = productsService;
-        }
-
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<Product>>> GetProducts()
-        {
-            var products = await this.productsService.GetProducts();
-            return Ok(products);
-        }
-
-        [HttpGet("{id:long}")] // api/Products/1
-        public async Task<ActionResult<Product>> GetProductById(long id)
-        {
-            var product = await this.productsService.GetProductById(id);
-            if (product == null) return NotFound();
-            return product;
+            this.productsRepository = productsRepository;
         }
 
         [HttpPost]
         public async Task<ActionResult<Product>> CreateProduct(Product product)
         {
-            return await this.productsService.CreateProduct(product);
-        }
-
-        [HttpPut("{id:long}")]
-        public async Task<ActionResult> UpdateProduct(long id,Product product)
-        {
-            if(product.Id!=id||!await this.productsService.ProductExist(id))
+            this.productsService.CreateProduct(product);
+            if (await this.productsService.SaveChangesAsync())
             {
-                return BadRequest("Cannot update this product");
+                return CreatedAtAction("GetProductById", new { id = product.Id }, product);
             }
 
-            await this.productsService.UpdateProduct(product);
-            return NoContent();
+            return BadRequest("Problem creatin product");
+        }
+
+        [HttpGet("brands")]
+        public async Task<ActionResult<IEnumerable<string>>> GetBrands()
+        {
+            var specification = new BrandSpecification();
+            return Ok(await this.productsRepository.ListAsync(specification));
+        }
+
+        [HttpGet("{id:long}")] // api/Products/1
+        public async Task<ActionResult<Product>> GetProductById(long id)
+        {
+            var product = await this.productsService.GetProductByIdAsync(id);
+            if (product == null) return NotFound();
+            return product;
+        }
+
+        [HttpGet]
+        public async Task<ActionResult<List<Product>>> GetProducts([FromQuery] string brand = null,
+            [FromQuery] string type = null, [FromQuery] string sort = null)
+        {
+            var specification = new ProductSpecification(brand, type, sort);
+            var products = await this.productsRepository.ListAsync(specification);
+            return Ok(products);
+        }
+
+        [HttpGet("types")]
+        public async Task<ActionResult<IEnumerable<string>>> GetTypes()
+        {
+            var specification = new TypeSpecification();
+            return Ok(await this.productsRepository.ListAsync(specification));
         }
 
         [HttpDelete("{id:long}")]
         public async Task<ActionResult> UpdateProduct(long id)
         {
-            var product = await this.productsService.GetProductById(id);
+            var product = await this.productsService.GetProductByIdAsync(id);
             if (product == null)
             {
                 return NotFound("Cannot find this product");
             }
 
-            await this.productsService.DeleteProduct(product);
-            return NoContent();
+            this.productsService.DeleteProduct(product);
+
+            if (await this.productsService.SaveChangesAsync())
+            {
+                return NoContent();
+            }
+
+            return BadRequest("Problem deleting the product");
+        }
+
+        [HttpPut("{id:long}")]
+        public async Task<ActionResult> UpdateProduct(long id, Product product)
+        {
+            if (product.Id != id || !this.productsService.ProductExist(id))
+            {
+                return BadRequest("Cannot update this product");
+            }
+
+            this.productsService.UpdateProduct(product);
+            if (await this.productsService.SaveChangesAsync())
+            {
+                return NoContent();
+            }
+            return BadRequest("Problem updating the product");
         }
     }
 }

@@ -1,3 +1,4 @@
+using E_Commerce.App.Infrastructure.Data;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
@@ -11,9 +12,12 @@ namespace E_Commerce.App.API
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async System.Threading.Tasks.Task Main(string[] args)
         {
-            CreateHostBuilder(args).Build().Run();
+            //var configuration = GetConfiguration();
+            var host = CreateHostBuilder(args).Build();
+            await StoreContextSeed.SeedAsync(args, host);
+            host.Run();
         }
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>

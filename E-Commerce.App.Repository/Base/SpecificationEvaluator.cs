@@ -1,0 +1,70 @@
+﻿using E_Commerce.App.Core.Entities;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace E_Commerce.App.Repository.Base
+{
+    public class SpecificationEvaluator<T> where T : BaseEntity
+    {
+        public static IQueryable<T> GetQuery(IQueryable<T> query, ISpecification<T> specification)
+        {
+            if(specification.Criteria!=null)
+            {
+                query = query.Where(specification.Criteria); // x => x.Brand == brand
+            }
+
+            if (specification.OrderBy != null)
+            {
+                query = query.OrderBy(specification.OrderBy);
+            }
+
+            if (specification.OrderByDescending != null)
+            {
+                query = query.OrderByDescending(specification.OrderByDescending);
+            }
+
+            if(specification.IsDistinct)
+            {
+                query = query.Distinct();
+            }
+
+            return query;
+        }
+
+        public static IQueryable<TResult> GetQuery<TSpec,TResult>(IQueryable<T> query,
+            ISpecification<T,TResult> specification)
+        {
+            if (specification.Criteria != null)
+            {
+                query = query.Where(specification.Criteria); // x => x.Brand == brand
+            }
+
+            if (specification.OrderBy != null)
+            {
+                query = query.OrderBy(specification.OrderBy);
+            }
+
+            if (specification.OrderByDescending != null)
+            {
+                query = query.OrderByDescending(specification.OrderByDescending);
+            }
+
+            var selectQuery = query as IQueryable<TResult>;
+
+            if(specification.Select!=null)
+            {
+                selectQuery = query.Select(specification.Select);
+            }
+
+            if (specification.IsDistinct)
+            {
+                selectQuery = selectQuery?.Distinct();
+            } 
+
+            return selectQuery ?? query.Cast<TResult>();
+        }
+    }
+}

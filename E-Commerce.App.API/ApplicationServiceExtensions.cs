@@ -1,4 +1,5 @@
 ﻿using E_Commerce.App.Repository;
+using E_Commerce.App.Repository.Base;
 using E_Commerce.App.Repository.Interface;
 using E_Commerce.App.Service;
 using E_Commerce.App.Service.Interface;
@@ -25,6 +26,7 @@ namespace E_Commerce.App.API
                 throw new ArgumentNullException(nameof(configuration));
             }
 
+            services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
             services.AddScoped<IProductsRepository, ProductsRepository>();
             services.AddScoped<IProductsService, ProductsService>();
         }

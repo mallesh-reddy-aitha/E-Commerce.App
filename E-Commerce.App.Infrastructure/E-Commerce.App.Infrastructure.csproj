@@ -15,6 +15,7 @@
 		  <PrivateAssets>all</PrivateAssets>
 		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 	  </PackageReference>
+	  <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="3.1.32" />
 	  <PackageReference Include="Npgsql" Version="5.0.7" />
 	  <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="5.0.7" />
 	  <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL.Design" Version="1.1.0" />
@@ -22,6 +23,15 @@
 
 	<ItemGroup>
 	  <ProjectReference Include="..\E-Commerce.App.Core\E-Commerce.App.Core.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Update="Data\SeedData\delivery.json">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
+	  <None Update="Data\SeedData\products.json">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
 	</ItemGroup>
 	
 </Project>

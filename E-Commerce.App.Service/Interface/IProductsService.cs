@@ -7,11 +7,33 @@ namespace E_Commerce.App.Service.Interface
 {
     public interface IProductsService
     {
-        Task<IEnumerable<Product>> GetProducts();
-        Task<Product> GetProductById(long id);
-        Task<Product> CreateProduct(Product product);
-        Task<bool> ProductExist(long id);
-        Task UpdateProduct(Product product);
-        Task DeleteProduct(Product product);
+
+        /// <summary>
+        /// Create product record.
+        /// </summary>
+        /// <param name="product">product.</param>
+        void CreateProduct(Product product);
+
+        void DeleteProduct(Product product);
+
+        Task<IEnumerable<string>> GetBrandsAsync();
+
+        Task<Product> GetProductByIdAsync(long id);
+        /// <summary>
+        /// Get all product records.
+        /// </summary>
+        /// <returns>List of products.</returns>
+        Task<List<Product>> GetProductsAsync();
+
+        Task<List<Product>> GetProductsAsync(string brand = null,
+            string type = null, string sort = null);
+
+        Task<IEnumerable<string>> GetTypesAsync();
+
+        bool ProductExist(long id);
+
+        Task<bool> SaveChangesAsync();
+
+        void UpdateProduct(Product product);
     }
 }

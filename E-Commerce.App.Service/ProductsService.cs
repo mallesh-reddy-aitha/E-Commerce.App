@@ -15,16 +15,14 @@ namespace E_Commerce.App.Service
             this.productsRepository = productsRepository;
         }
 
-        public async Task<Product> CreateProduct(Product product)
+        public void CreateProduct(Product product)
         {
             try
             {
                 if (product != null)
                 {
-                    await this.productsRepository.CreateProduct(product);
+                    this.productsRepository.Add(product);
                 }
-
-                return product;
             }
             catch (Exception)
             {
@@ -32,11 +30,11 @@ namespace E_Commerce.App.Service
             }
         }
 
-        public async Task DeleteProduct(Product product)
+        public void DeleteProduct(Product product)
         {
             try
             {
-                await this.productsRepository.DeleteProduct(product);
+                this.productsRepository.Remove(product);
             }
             catch (Exception)
             {
@@ -44,13 +42,25 @@ namespace E_Commerce.App.Service
             }
         }
 
-        public async Task<Product> GetProductById(long id)
+        public async Task<IEnumerable<string>> GetBrandsAsync()
+        {
+            try
+            {
+                return await this.productsRepository.GetBrandsAsync();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<Product> GetProductByIdAsync(long id)
         {
             try
             {
                 if (id > 0)
                 {
-                    return await this.productsRepository.GetProductById(id);
+                    return await this.productsRepository.GetByIdAsync(id);
                 }
 
                 return new Product();
@@ -61,11 +71,11 @@ namespace E_Commerce.App.Service
             }
         }
 
-        public async Task<IEnumerable<Product>> GetProducts()
+        public async Task<List<Product>> GetProductsAsync()
         {
             try
             {
-                return await this.productsRepository.GetProducts();
+                return await this.productsRepository.GetProductsAsync();
             }
             catch (Exception)
             {
@@ -74,11 +84,12 @@ namespace E_Commerce.App.Service
             }
         }
 
-        public async Task<bool> ProductExist(long id)
+        public async Task<List<Product>> GetProductsAsync(string brand = null,
+            string type = null, string sort = null)
         {
             try
             {
-                return await this.productsRepository.ProductExist(id);
+                return await this.productsRepository.GetProductsAsync(brand, type);
             }
             catch (Exception)
             {
@@ -86,11 +97,47 @@ namespace E_Commerce.App.Service
             }
         }
 
-        public async Task UpdateProduct(Product product)
+        public async Task<IEnumerable<string>> GetTypesAsync()
         {
             try
             {
-                await this.productsRepository.UpdateProduct(product);
+                return await this.productsRepository.GetTypesAsync();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public bool ProductExist(long id)
+        {
+            try
+            {
+                return this.productsRepository.Exist(id);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<bool> SaveChangesAsync()
+        {
+            try
+            {
+                return await this.productsRepository.SaveAllAsync();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public void UpdateProduct(Product product)
+        {
+            try
+            {
+                this.productsRepository.Update(product);
             }
             catch (Exception)
             {

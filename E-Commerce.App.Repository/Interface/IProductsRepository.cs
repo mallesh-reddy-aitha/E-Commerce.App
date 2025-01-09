@@ -1,17 +1,18 @@
 ﻿using E_Commerce.App.Core.Entities;
+using E_Commerce.App.Repository.Base;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace E_Commerce.App.Repository.Interface
 {
-    public interface IProductsRepository
+    public interface IProductsRepository: IGenericRepository<Product>
     {
-        Task<IEnumerable<Product>> GetProducts();
-        Task<Product> GetProductById(long id);
-        Task<Product> CreateProduct(Product product);
-        Task<bool> ProductExist(long id);
-        Task UpdateProduct(Product product);
-        Task DeleteProduct(Product product);
+        Task<IEnumerable<string>> GetBrandsAsync();
+
+        Task<List<Product>> GetProductsAsync(string brand = null,
+            string type = null, string sort = null);
+
+        Task<IEnumerable<string>> GetTypesAsync();
     }
 }
