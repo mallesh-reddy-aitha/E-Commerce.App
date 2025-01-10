@@ -31,6 +31,11 @@ namespace E_Commerce.App.Repository.Base
                 query = query.Distinct();
             }
 
+            if(specification.IsPagingEnabled)
+            {
+                query = query.Skip(specification.Skip).Take(specification.Take);
+            }
+
             return query;
         }
 
@@ -62,7 +67,12 @@ namespace E_Commerce.App.Repository.Base
             if (specification.IsDistinct)
             {
                 selectQuery = selectQuery?.Distinct();
-            } 
+            }
+
+            if (specification.IsPagingEnabled)
+            {
+                selectQuery = selectQuery?.Skip(specification.Skip).Take(specification.Take);
+            }
 
             return selectQuery ?? query.Cast<TResult>();
         }

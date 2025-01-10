@@ -11,6 +11,8 @@ namespace E_Commerce.App.Repository.Base
 
         void Add(T entity);
 
+        Task<int> CountAsync(ISpecification<T> specification);
+
         bool Exist(long id);
 
         Task<T> GetByIdAsync(long id);

@@ -1,3 +1,4 @@
+using E_Commerce.App.API.Middleware;
 using E_Commerce.App.Infrastructure.Data;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -31,6 +32,7 @@ namespace E_Commerce.App.API
             var userDbConnection = this.Configuration.GetConnectionString("UserDbConnection");
             services.AddDbContext<StoreDbContext>(options => options.UseNpgsql(userDbConnection));
             services.AddApplicationServices(this.Configuration);
+            services.AddCors();
             services.AddSwaggerGen();
             services.AddSwaggerGen(c =>
             {
@@ -56,6 +58,11 @@ namespace E_Commerce.App.API
             app.UseRouting();
 
             app.UseAuthorization();
+
+            app.UseMiddleware<ExceptionMiddleware>();
+
+            app.UseCors(x => x.AllowAnyHeader().AllowAnyMethod()
+            .WithOrigins("http://localhost:4200", "http://localhost:4200"));
 
             app.UseSwagger();
 

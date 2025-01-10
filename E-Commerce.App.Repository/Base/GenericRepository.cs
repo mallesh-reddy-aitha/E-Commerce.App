@@ -28,6 +28,15 @@ namespace E_Commerce.App.Repository.Base
             this.storeDbContext.Set<T>().Add(entity);
         }
 
+        public async Task<int> CountAsync(ISpecification<T> specification)
+        {
+            var query = this.storeDbContext.Set<T>().AsQueryable();
+
+            query = specification.ApplyCriteria(query);
+
+            return await query.CountAsync();
+        }
+
         public bool Exist(long id)
         {
             return this.storeDbContext.Set<T>().Any(x => x.Id == id);

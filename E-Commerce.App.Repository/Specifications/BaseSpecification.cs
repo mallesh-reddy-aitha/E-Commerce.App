@@ -1,6 +1,7 @@
 ﻿using E_Commerce.App.Repository.Base;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
 
@@ -9,6 +10,7 @@ namespace E_Commerce.App.Repository.Specifications
     public class BaseSpecification<T> : ISpecification<T>
     {
         private readonly Expression<Func<T, bool>> criteria;
+
         public BaseSpecification()
         {
 
@@ -18,14 +20,6 @@ namespace E_Commerce.App.Repository.Specifications
         {
             this.criteria = criteria;
         }
-
-        public Expression<Func<T, bool>> Criteria => this.criteria;
-
-        public Expression<Func<T, object>> OrderBy { get; private set; }
-
-        public Expression<Func<T, object>> OrderByDescending { get; private set; }
-
-        public bool IsDistinct { get; private set; }
 
         protected void AddOrderBy(Expression<Func<T, object>> orderByExpression)
         {
@@ -41,6 +35,37 @@ namespace E_Commerce.App.Repository.Specifications
         {
             IsDistinct = true;
         }
+
+        protected void ApplyPaging(int skip, int take)
+        {
+            Skip = skip;
+            Take = take;
+            IsPagingEnabled = true;
+        }
+
+        public IQueryable<T> ApplyCriteria(IQueryable<T> query)
+        {
+            if(Criteria!=null)
+            {
+                query = query.Where(Criteria);
+            }
+
+            return query;
+        }
+
+        public Expression<Func<T, bool>> Criteria => this.criteria;
+
+        public bool IsDistinct { get; private set; }
+
+        public bool IsPagingEnabled { get; private set; }
+
+        public Expression<Func<T, object>> OrderBy { get; private set; }
+
+        public Expression<Func<T, object>> OrderByDescending { get; private set; }
+
+        public int Skip { get; private set; }
+
+        public int Take { get; private set; }
     }
 
     public class BaseSpecification<T, TResult> : BaseSpecification<T>, ISpecification<T, TResult>
@@ -57,12 +82,12 @@ namespace E_Commerce.App.Repository.Specifications
             this.criteria = criteria;
         }
 
-        public Expression<Func<T, TResult>> Select { get; private set; }
-
         protected void AddSelect(Expression<Func<T, TResult>> selectExpression)
         {
             Select = selectExpression;
         }
+
+        public Expression<Func<T, TResult>> Select { get; private set; }
     }
 }
 

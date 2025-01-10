@@ -1,5 +1,7 @@
-﻿using E_Commerce.App.Core.Entities;
+﻿using E_Commerce.App.API.RequestHelpers;
+using E_Commerce.App.Core.Entities;
 using E_Commerce.App.Infrastructure.Data;
+using E_Commerce.App.Repository.Base;
 using E_Commerce.App.Repository.Interface;
 using E_Commerce.App.Repository.Specifications;
 using E_Commerce.App.Service.Interface;
@@ -15,16 +17,16 @@ namespace E_Commerce.App.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ProductsController : ControllerBase
+    public class ProductsController : BaseApiController
     {
         private readonly IProductsService productsService;
-        private readonly IProductsRepository productsRepository;
+        private readonly IGenericRepository<Product> genericRepository;
 
         public ProductsController(IProductsService productsService,
-            IProductsRepository productsRepository)
+            IGenericRepository<Product> genericRepository)
         {
             this.productsService = productsService;
-            this.productsRepository = productsRepository;
+            this.genericRepository = genericRepository;
         }
 
         [HttpPost]
@@ -43,7 +45,7 @@ namespace E_Commerce.App.API.Controllers
         public async Task<ActionResult<IEnumerable<string>>> GetBrands()
         {
             var specification = new BrandSpecification();
-            return Ok(await this.productsRepository.ListAsync(specification));
+            return Ok(await this.genericRepository.ListAsync(specification));
         }
 
         [HttpGet("{id:long}")] // api/Products/1
@@ -55,19 +57,19 @@ namespace E_Commerce.App.API.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<List<Product>>> GetProducts([FromQuery] string brand = null,
-            [FromQuery] string type = null, [FromQuery] string sort = null)
+        public async Task<ActionResult<List<Product>>> GetProducts([FromQuery] ProductSpecificationParameters specificationParameters)
         {
-            var specification = new ProductSpecification(brand, type, sort);
-            var products = await this.productsRepository.ListAsync(specification);
-            return Ok(products);
+            var specification = new ProductSpecification(specificationParameters);
+            
+            return await CreatePagedResult(genericRepository, specification, specificationParameters.PageIndex,
+                specificationParameters.PageSize);
         }
 
         [HttpGet("types")]
         public async Task<ActionResult<IEnumerable<string>>> GetTypes()
         {
             var specification = new TypeSpecification();
-            return Ok(await this.productsRepository.ListAsync(specification));
+            return Ok(await this.genericRepository.ListAsync(specification));
         }
 
         [HttpDelete("{id:long}")]
